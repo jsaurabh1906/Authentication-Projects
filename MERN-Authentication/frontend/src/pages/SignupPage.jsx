@@ -2,14 +2,27 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Loader, Lock, Mail, User } from "lucide-react";
 import Input from "../components/Input";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
+import { useAuthStore } from "../store/authStore";
 const SignupPage = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const isLoading = false;
-  const handleSignup = () => {};
+  const { signup, isLoading, error } = useAuthStore();
+  const navigate = useNavigate();
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    // Call the signup function from the authStore
+    try {
+      await signup(email, password, name);
+      navigate("/verify-email");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -43,6 +56,10 @@ const SignupPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          {/* Error */}
+          {error && (
+            <p className="text-red-500 text-sm mt-2 font-semibold">{error}</p>
+          )}
           {/* Password Strength meter */}
           <PasswordStrengthMeter password={password} />
           <motion.button

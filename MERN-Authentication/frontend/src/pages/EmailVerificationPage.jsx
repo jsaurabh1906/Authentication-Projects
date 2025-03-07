@@ -1,12 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/authStore";
+import toast from "react-hot-toast";
 
 const EmailVerificationPage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRef = useRef([]);
-  const isLoading = false;
   const navigate = useNavigate();
+
+  const { verifyEmail, error, isLoading } = useAuthStore();
 
   // This function handles the change event for each input field
   const handleChange = (value, index) => {
@@ -57,10 +60,18 @@ const EmailVerificationPage = () => {
     }
   }, [code]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const verificationCode = code.join("");
-    alert(`VErification code submitted, ${verificationCode}`);
+    try {
+      console.log("sending v-code", verificationCode);
+
+      await verifyEmail(verificationCode);
+      navigate("/");
+      toast.success("Email verified successfully");
+    } catch (error) {
+      console.log("Error Verifying Email:", error);
+    }
   };
 
   return (
@@ -77,7 +88,7 @@ const EmailVerificationPage = () => {
         <p className="text-center mb-6 text-slate-300">
           Enter the 6-digit code sent to your email address
         </p>
-        <form onSubmit={""} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="flex justify-evenly">
             {code.map((digit, index) => (
               <input
@@ -93,7 +104,12 @@ const EmailVerificationPage = () => {
                 className="w-11 h-11 text-center text-2xl font-bold bg-slate-700 text-white border-2 border-slate-400 rounded-lg focus:border-indigo-500 focus:outline-none"
               />
             ))}
-          </div>{" "}
+          </div>
+          {error && (
+            <p className="text-red-500 text-center font-semibold mt-2">
+              {error}
+            </p>
+          )}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
