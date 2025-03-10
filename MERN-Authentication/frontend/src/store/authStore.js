@@ -5,11 +5,13 @@ const API_URL = import.meta.env.VITE_LOCAL_BACKEND_URL;
 
 axios.defaults.withCredentials = true;
 export const useAuthStore = create((set) => ({
+  //initial states
   user: null,
   isAuthenticated: false,
   error: null,
   isLoading: false,
   isCheckingAuth: true,
+  message: null,
 
   //signup
   signup: async (email, password, name) => {
@@ -118,6 +120,48 @@ export const useAuthStore = create((set) => ({
         error: null,
         isCheckingAuth: false,
         isAuthenticated: false,
+      });
+    }
+  },
+
+  //forgot password
+  forgotPassword: async (email) => {
+    set({ isLoading: true, error: null, message: null });
+    try {
+      const response = await axios.post(`${API_URL}/forgot-password`, {
+        email,
+      });
+      set({
+        message: response.data.message,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error.response.data.message || "Error Sending Reset Link",
+      });
+
+      throw error;
+    }
+  },
+
+  //reset password
+  resetPassword: async ({ password, token }) => {
+    // console.log("password: ", password);
+    // console.log("token: ", token);
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(`${API_URL}/reset-password/${token}`, {
+        password,
+      });
+      set({
+        isLoading: false,
+        message: response.data.message,
+      });
+    } catch (error) {
+      set({
+        isLoading: false,
+        error: error.response.data.message || "Error Resetting Password",
       });
     }
   },
