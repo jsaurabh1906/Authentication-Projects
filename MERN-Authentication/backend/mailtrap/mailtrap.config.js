@@ -13,8 +13,8 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const TOKEN = process.env.MAILTRAP_TOKEN;
 const ENDPOINT = process.env.MAILTRAP_ENDPOINT;
 
-console.log("MAILTRAP_TOKEN:", process.env.MAILTRAP_TOKEN);
-console.log("MAILTRAP_ENDPOINT:", process.env.MAILTRAP_ENDPOINT);
+// console.log("MAILTRAP_TOKEN:", process.env.MAILTRAP_TOKEN);
+// console.log("MAILTRAP_ENDPOINT:", process.env.MAILTRAP_ENDPOINT);
 
 if (!TOKEN) {
   throw new Error("MAILTRAP_TOKEN is missing from environment variables.");
